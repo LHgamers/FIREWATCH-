@@ -1,0 +1,684 @@
+/* ==========================================================================
+   FIREWATCH motion system — components/motion/motion.css
+   --------------------------------------------------------------------------
+   Rules enforced here:
+
+   * Only `opacity` and `transform` are animated. Both are compositor
+     properties, so no frame triggers layout or paint of the data underneath.
+   * Nothing is hidden unless JavaScript has explicitly armed it
+     (`[data-reveal="armed"]`). With JS disabled every element renders in its
+     final state.
+   * `prefers-reduced-motion: reduce` neutralises every animation and
+     transition here, and `html[data-motion="off"]` is a manual kill switch
+     (the <MotionRoot> component sets it when the media query matches, and any
+     page may set it directly).
+   * Class prefix `fw-` keeps this file from colliding with app/globals.css.
+   ========================================================================== */
+
+@keyframes fw-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fw-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes fw-rise-sm {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes fw-scale-in {
+  from {
+    opacity: 0;
+    transform: scale3d(0.98, 0.98, 1);
+  }
+  to {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+@keyframes fw-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fw-indeterminate {
+  0% {
+    transform: translate3d(-100%, 0, 0) scaleX(0.35);
+  }
+  55% {
+    transform: translate3d(30%, 0, 0) scaleX(0.55);
+  }
+  100% {
+    transform: translate3d(100%, 0, 0) scaleX(0.35);
+  }
+}
+
+@keyframes fw-pulse-soft {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ---------------------------------------------------------------- page */
+
+.fw-page {
+  animation: fw-rise 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ------------------------------------------------------------- reveals */
+
+/* Default state = final state. Only a JS-armed element is hidden. */
+.fw-reveal {
+  opacity: 1;
+  transform: none;
+}
+
+.fw-reveal[data-reveal="armed"] {
+  opacity: 0;
+  transform: translate3d(0, 10px, 0);
+}
+
+.fw-reveal[data-reveal="in"] {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition:
+    opacity 380ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 380ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--fw-delay, 0ms);
+}
+
+/* --------------------------------------------------------------- fades */
+
+.fw-fade-in {
+  animation: fw-fade-in 320ms ease-out both;
+  animation-delay: var(--fw-delay, 0ms);
+}
+
+.fw-rise-in {
+  animation: fw-rise 380ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: var(--fw-delay, 0ms);
+}
+
+.fw-rise-in-sm {
+  animation: fw-rise-sm 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--fw-delay, 0ms);
+}
+
+.fw-scale-in {
+  animation: fw-scale-in 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: var(--fw-delay, 0ms);
+}
+
+/* -------------------------------------------------------------- panels */
+
+.fw-panel {
+  transition:
+    transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 220ms ease,
+    box-shadow 220ms ease;
+  will-change: auto;
+}
+
+.fw-panel[data-interactive="true"]:hover {
+  transform: translate3d(0, -1px, 0);
+}
+
+.fw-panel[data-interactive="true"]:active {
+  transform: translate3d(0, 0, 0);
+}
+
+/* ------------------------------------------------------------- buttons */
+
+.fw-btn {
+  transition:
+    transform 140ms cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease,
+    opacity 140ms ease;
+  touch-action: manipulation;
+}
+
+.fw-btn:active:not(:disabled) {
+  transform: scale3d(0.985, 0.985, 1);
+}
+
+.fw-btn[data-pressed="true"] {
+  transform: translate3d(0, 0, 0);
+}
+
+/* ------------------------------------------------------------- counter */
+
+.fw-counter {
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------------- loader */
+
+.fw-spinner {
+  display: inline-block;
+  border-radius: 999px;
+  border-style: solid;
+  border-color: currentColor;
+  border-top-color: transparent;
+  animation: fw-spin 760ms linear infinite;
+}
+
+.fw-bar {
+  position: relative;
+  overflow: hidden;
+  background: rgb(var(--elevated, 22 33 54) / 0.7);
+}
+
+.fw-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+  background: linear-gradient(
+    90deg,
+    rgb(var(--cyan, 57 200 242) / 0),
+    rgb(var(--cyan, 57 200 242) / 0.55),
+    rgb(var(--cyan, 57 200 242) / 0)
+  );
+  animation: fw-indeterminate 1.35s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.fw-dot {
+  animation: fw-pulse-soft 1.6s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   Data-arrival and interaction motion
+   --------------------------------------------------------------------------
+   Everything below animates compositor properties only (opacity, transform)
+   and every entrance uses `animation-fill-mode: backwards`, so when the
+   animation ends the element returns to its own styles — a hover transform or
+   Tailwind class keeps working instead of being pinned by a filled keyframe.
+   ========================================================================== */
+
+/* Cell pop — used by the calendar grid. The implicit end keyframe is the
+   element's own computed style, so the hover scale on a day cell survives. */
+@keyframes fw-pop {
+  from {
+    opacity: 0;
+    transform: scale3d(0.82, 0.82, 1);
+  }
+}
+
+/* Skeleton shimmer. `background-position` is not compositor-only but the
+   element is an empty placeholder, so there is nothing underneath to repaint. */
+@keyframes fw-shimmer {
+  from {
+    background-position: -140% 0;
+  }
+  to {
+    background-position: 240% 0;
+  }
+}
+
+/* A single pass of a scan line, used over the hero imagery. */
+@keyframes fw-scan {
+  0% {
+    transform: translate3d(0, -130%, 0);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.75;
+  }
+  70% {
+    opacity: 0.45;
+  }
+  100% {
+    transform: translate3d(0, 420%, 0);
+    opacity: 0;
+  }
+}
+
+/* Live indicator: a ring expands out of the dot and fades. */
+@keyframes fw-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  70%,
+  100% {
+    transform: scale(2.8);
+    opacity: 0;
+  }
+}
+
+@keyframes fw-grow-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes fw-grow-y {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes fw-slide-in-right {
+  from {
+    opacity: 0;
+    transform: translate3d(28px, 0, 0);
+  }
+}
+
+@keyframes fw-slide-in-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+}
+
+/* -------------------------------------------------------------- stagger */
+
+/* A list that arrives in order. The delay is pure CSS (nth-child), so no
+   JavaScript array index can drift from the rendered order. Capped at ten
+   children: beyond that the whole list has already arrived. */
+.fw-stagger > * {
+  animation: fw-rise-in-sm 300ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.fw-stagger > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+.fw-stagger > *:nth-child(2) {
+  animation-delay: 36ms;
+}
+.fw-stagger > *:nth-child(3) {
+  animation-delay: 72ms;
+}
+.fw-stagger > *:nth-child(4) {
+  animation-delay: 108ms;
+}
+.fw-stagger > *:nth-child(5) {
+  animation-delay: 144ms;
+}
+.fw-stagger > *:nth-child(6) {
+  animation-delay: 180ms;
+}
+.fw-stagger > *:nth-child(7) {
+  animation-delay: 216ms;
+}
+.fw-stagger > *:nth-child(8) {
+  animation-delay: 252ms;
+}
+.fw-stagger > *:nth-child(n + 9) {
+  animation-delay: 288ms;
+}
+
+/* -------------------------------------------------------------- skeleton */
+
+.fw-skeleton {
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+  background-color: rgb(var(--elevated, 22 33 54) / 0.55);
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgb(var(--line, 34 48 74) / 0.55) 45%,
+    rgb(var(--line, 34 48 74) / 0.55) 55%,
+    transparent 100%
+  );
+  background-size: 220% 100%;
+  background-repeat: no-repeat;
+  animation: fw-shimmer 1.35s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* ------------------------------------------------------------------ hero */
+
+.fw-hero-scan {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 22%;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgb(var(--cyan, 57 200 242) / 0.16),
+    rgb(var(--cyan, 57 200 242) / 0.02)
+  );
+  animation: fw-scan 5.4s cubic-bezier(0.45, 0, 0.55, 1) 1.2s infinite;
+}
+
+.fw-live {
+  position: relative;
+  display: inline-flex;
+}
+
+.fw-live::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: currentColor;
+  animation: fw-ping 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* ------------------------------------------------------------------ bars */
+
+.fw-grow-x {
+  transform-origin: left center;
+  animation: fw-grow-x 620ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation-delay: var(--fw-delay, 0ms);
+}
+
+.fw-grow-y {
+  transform-origin: bottom center;
+  animation: fw-grow-y 620ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation-delay: var(--fw-delay, 0ms);
+}
+
+/* ---------------------------------------------------------------- cells */
+
+.fw-cell-in {
+  animation: fw-pop 300ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation-delay: var(--fw-delay, 0ms);
+}
+
+/* ---------------------------------------------------------------- drawer */
+
+.fw-backdrop-in {
+  animation: fw-fade-in 180ms ease-out backwards;
+}
+
+.fw-drawer-in {
+  animation: fw-slide-in-right 320ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+.fw-sheet-in {
+  animation: fw-slide-in-up 280ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+/* ------------------------------------------------------------ intro gate
+   The shell fades in after the cinematic. Pause its content-specific
+   entrances during the cinematic so they start with the reveal. */
+
+html[data-intro="playing"] .fw-stagger > *,
+html[data-intro="playing"] .fw-hero-scan,
+html[data-intro="playing"] .fw-cell-in,
+html[data-intro="playing"] .fw-grow-x {
+  animation-play-state: paused;
+}
+
+/* ------------------------------------------------------------ interface
+   Chrome-level motion for the app shell and data lists. Every rule here is a
+   transition or a `backwards`-filled entrance, so the resting state is always
+   the plain, un-animated layout. */
+
+@keyframes fw-slide-in-left {
+  from {
+    opacity: 0;
+    transform: translate3d(-18px, 0, 0);
+  }
+}
+
+.fw-slide-left-in {
+  animation: fw-slide-in-left 300ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation-delay: var(--fw-delay, 0ms);
+}
+
+/* Press feedback for anything clickable that is not a `.btn`. */
+.fw-tap {
+  transition:
+    transform 120ms cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease;
+}
+
+.fw-tap:active:not(:disabled) {
+  transform: scale3d(0.96, 0.96, 1);
+}
+
+/* A list row: nudge in the reading direction and lift its background. */
+.fw-row {
+  transition:
+    transform 180ms cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 180ms ease;
+}
+
+.fw-row:hover {
+  transform: translate3d(2px, 0, 0);
+}
+
+/* A card that responds to the pointer without moving its own contents. */
+.fw-hover-lift {
+  transition:
+    transform 200ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 200ms ease,
+    background-color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.fw-hover-lift:hover {
+  transform: translate3d(0, -2px, 0);
+  box-shadow: 0 12px 28px -22px rgba(0, 0, 0, 0.55);
+}
+
+.fw-hover-lift:active {
+  transform: translate3d(0, 0, 0);
+}
+
+/* Sticky top bar: gains a hairline shadow once the page has scrolled, which
+   is the only cue that content is passing underneath it. */
+.fw-topbar {
+  transition: box-shadow 240ms ease, background-color 240ms ease;
+}
+
+.fw-topbar[data-scrolled="true"] {
+  box-shadow: 0 12px 30px -26px rgba(0, 0, 0, 0.9);
+}
+
+/* A meter that fills from zero the first time it appears. */
+.fw-meter {
+  transform-origin: left center;
+  animation: fw-grow-x 700ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation-delay: var(--fw-delay, 0ms);
+}
+
+/* Numbers that change in place: a short highlight so a reader notices. */
+@keyframes fw-value-flash {
+  from {
+    color: rgb(var(--cyan, 57 200 242));
+  }
+}
+
+.fw-value-flash {
+  animation: fw-value-flash 520ms ease-out;
+}
+
+/* Tactile press for the shared `.btn` class defined in app/globals.css, so
+   every button in the product answers a click the same way. Scoped to
+   data-motion="on" so the kill switch and reduced motion stay absolute. */
+html[data-motion="on"] .btn {
+  transition:
+    transform 140ms cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease,
+    opacity 140ms ease;
+}
+
+html[data-motion="on"] .btn:active:not(:disabled) {
+  transform: scale3d(0.985, 0.985, 1);
+}
+
+/* --------------------------------------------------------- reduced motion
+   Belt and braces: app/globals.css already clamps durations globally, but
+   this file must also be correct when used on its own (e.g. in Storybook or
+   if globals.css is refactored). */
+
+@media (prefers-reduced-motion: reduce) {
+  .fw-page,
+  .fw-fade-in,
+  .fw-rise-in,
+  .fw-rise-in-sm,
+  .fw-scale-in,
+  .fw-reveal[data-reveal="in"] {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .fw-reveal[data-reveal="armed"] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .fw-panel,
+  .fw-btn,
+  .fw-btn:active:not(:disabled) {
+    transition: none !important;
+    transform: none !important;
+  }
+
+  .fw-spinner {
+    animation-duration: 1.6s !important;
+  }
+
+  .fw-bar::after {
+    animation: none !important;
+    transform: none !important;
+    opacity: 0.5;
+  }
+
+  .fw-dot {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  .fw-stagger > *,
+  .fw-grow-x,
+  .fw-grow-y,
+  .fw-cell-in,
+  .fw-backdrop-in,
+  .fw-drawer-in,
+  .fw-sheet-in,
+  .fw-hero-scan,
+  .fw-skeleton,
+  .fw-slide-left-in,
+  .fw-meter,
+  .fw-value-flash {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .fw-tap,
+  .fw-row,
+  .fw-hover-lift,
+  .fw-topbar {
+    transition: none !important;
+  }
+
+  .fw-row:hover,
+  .fw-hover-lift:hover,
+  .fw-hover-lift:active,
+  .fw-tap:active:not(:disabled) {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  .fw-live::after {
+    animation: none !important;
+    opacity: 0 !important;
+  }
+}
+
+/* Manual kill switch — set by <MotionRoot> and overridable per page. */
+html[data-motion="off"] .fw-page,
+html[data-motion="off"] .fw-fade-in,
+html[data-motion="off"] .fw-rise-in,
+html[data-motion="off"] .fw-rise-in-sm,
+html[data-motion="off"] .fw-scale-in,
+html[data-motion="off"] .fw-reveal[data-reveal="armed"],
+html[data-motion="off"] .fw-reveal[data-reveal="in"] {
+  animation: none !important;
+  transition: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+html[data-motion="off"] .fw-panel,
+html[data-motion="off"] .fw-btn {
+  transition: none !important;
+  transform: none !important;
+}
+
+html[data-motion="off"] .fw-bar::after {
+  animation: none !important;
+  transform: none !important;
+  opacity: 0.5;
+}
+
+html[data-motion="off"] .fw-stagger > *,
+html[data-motion="off"] .fw-grow-x,
+html[data-motion="off"] .fw-grow-y,
+html[data-motion="off"] .fw-cell-in,
+html[data-motion="off"] .fw-backdrop-in,
+html[data-motion="off"] .fw-drawer-in,
+html[data-motion="off"] .fw-sheet-in,
+html[data-motion="off"] .fw-hero-scan,
+html[data-motion="off"] .fw-skeleton,
+html[data-motion="off"] .fw-slide-left-in,
+html[data-motion="off"] .fw-meter,
+html[data-motion="off"] .fw-value-flash {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+  background-image: none !important;
+}
+
+html[data-motion="off"] .fw-tap,
+html[data-motion="off"] .fw-row,
+html[data-motion="off"] .fw-hover-lift,
+html[data-motion="off"] .fw-topbar {
+  transition: none !important;
+}
+
+html[data-motion="off"] .fw-row:hover,
+html[data-motion="off"] .fw-hover-lift:hover,
+html[data-motion="off"] .fw-hover-lift:active,
+html[data-motion="off"] .fw-tap:active:not(:disabled) {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+html[data-motion="off"] .fw-live::after {
+  animation: none !important;
+  opacity: 0 !important;
+}

@@ -1,0 +1,25 @@
+{
+  "name": "FIREWATCH AI \u2014 Local Edition",
+  "archive": "FIREWATCH_AI_Local_Edition_v0.2.0.zip",
+  "version": "0.2.0",
+  "sizeBytes": 41839,
+  "sizeMB": 0.04,
+  "sha256": "9c79a703382d75f0102fc88e639bc373fdc7a6a83a19e26f907edc29c57e7780",
+  "fileCount": 21,
+  "uncompressedBytes": 101303,
+  "included": "Python application (stdlib only), FIREWATCH system instructions, 6-document knowledge base, SQLite FTS5 retrieval, branded local chat UI, installer/diagnostic scripts, offline tests, README",
+  "excluded": [
+    ".venv",
+    "data",
+    "exports",
+    "__pycache__",
+    "model weights"
+  ],
+  "containsModelWeights": false,
+  "fineTuned": false,
+  "baseModel": {
+    "tag": "qwen2.5:7b-instruct",
+    "license": "Apache 2.0",
+    "sizeGB": 4.7
+  }
+}

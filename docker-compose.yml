@@ -1,0 +1,36 @@
+services:
+  engine:
+    build:
+      context: .
+      dockerfile: engine/Dockerfile
+    environment:
+      ENGINE_PORT: "8010"
+      FIRMS_MAP_KEY: ${FIRMS_MAP_KEY:-}
+      AI_PROVIDER: ${AI_PROVIDER:-none}
+      AI_BASE_URL: ${AI_BASE_URL:-}
+      AI_MODEL: ${AI_MODEL:-}
+    volumes:
+      - firewatch-data:/data
+    ports:
+      - "8010:8010"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8010/api/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  web:
+    build:
+      context: .
+      args:
+        ENGINE_URL: http://engine:8010
+    environment:
+      ENGINE_URL: http://engine:8010
+    depends_on:
+      engine:
+        condition: service_started
+    ports:
+      - "3000:3000"
+
+volumes:
+  firewatch-data:

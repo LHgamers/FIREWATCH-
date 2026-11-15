@@ -1,0 +1,616 @@
+/* ------------------------------------------------------------------------- *
+ * FIREWATCH — cinematic intro
+ * Self-contained: no external images, no webfonts, no keyframe libraries.
+ * Only the CSS-only fallback and a couple of decorative loops animate in CSS;
+ * the main sequence is driven frame-by-frame from the WebGL timeline so the
+ * picture and the sound design stay locked together.
+ * ------------------------------------------------------------------------- */
+
+.fw-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(120% 90% at 50% 46%, #0c1626 0%, #080d18 52%, #05080f 100%);
+  color: #f1f5fc;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+.fw-stage {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.fw-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- lens: vignette + fine grain ---------------------------------- */
+.fw-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(115% 82% at 50% 46%, rgba(0, 0, 0, 0) 34%, rgba(4, 7, 13, 0.55) 76%, rgba(3, 5, 10, 0.92) 100%),
+    linear-gradient(to bottom, rgba(5, 8, 15, 0.8) 0%, rgba(5, 8, 15, 0) 24%, rgba(5, 8, 15, 0) 58%, rgba(5, 8, 15, 0.94) 100%);
+}
+
+.fw-grain {
+  position: absolute;
+  inset: -40%;
+  pointer-events: none;
+  opacity: 0.045;
+  mix-blend-mode: screen;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/></filter><rect width='180' height='180' filter='url(%23n)' opacity='0.55'/></svg>");
+  background-size: 260px 260px;
+  animation: fw-grain-drift 1.4s steps(4) infinite;
+}
+@keyframes fw-grain-drift {
+  0% { transform: translate3d(0, 0, 0); }
+  25% { transform: translate3d(-2%, 1%, 0); }
+  50% { transform: translate3d(1%, -2%, 0); }
+  75% { transform: translate3d(-1%, -1%, 0); }
+  100% { transform: translate3d(2%, 1%, 0); }
+}
+
+/* ---------- centred lockups --------------------------------------------- */
+.fw-layer {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: max(20px, 5vw);
+  pointer-events: none;
+  will-change: opacity, transform;
+}
+.fw-layer[hidden] {
+  display: none;
+}
+
+.fw-lockup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(12px, 2.1vh, 22px);
+  max-width: 100%;
+}
+
+/* Three-person cutout: the artwork's own alpha feather keeps it off a plate,
+   so the silhouettes sit directly in the void with no visible box. */
+.fw-trio {
+  width: clamp(248px, 40vmin, 440px);
+  height: auto;
+  opacity: 0.92;
+  filter: drop-shadow(0 10px 44px rgba(96, 58, 214, 0.28));
+  user-select: none;
+  pointer-events: none;
+}
+
+.fw-mark-wrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: clamp(38px, 5.4vmin, 54px);
+  aspect-ratio: 1;
+}
+.fw-mark-glow {
+  position: absolute;
+  inset: -55%;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(
+    circle,
+    rgba(255, 178, 108, 0.55) 0%,
+    rgba(255, 99, 61, 0.22) 26%,
+    rgba(57, 200, 242, 0.14) 48%,
+    rgba(57, 200, 242, 0) 72%
+  );
+  filter: blur(14px);
+  will-change: opacity, transform;
+}
+.fw-mark {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 0 14px rgba(57, 200, 242, 0.5)) drop-shadow(0 0 34px rgba(255, 140, 70, 0.22));
+}
+.fw-mark path,
+.fw-mark circle,
+.fw-mark ellipse {
+  will-change: opacity;
+}
+
+.fw-wordmark {
+  font-family: var(--font-sans);
+  font-size: clamp(20px, 3.5vw, 42px);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.3em;
+  margin-right: -0.3em;
+  text-transform: uppercase;
+  color: #f1f5fc;
+  white-space: nowrap;
+  will-change: opacity, transform, letter-spacing;
+}
+
+.fw-sublabel {
+  font-family: var(--font-mono);
+  font-size: clamp(8px, 1.05vw, 10.5px);
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: rgba(145, 162, 185, 0.92);
+  text-align: center;
+  white-space: nowrap;
+  will-change: opacity, transform, letter-spacing;
+}
+.fw-sublabel em {
+  font-style: normal;
+  color: rgba(57, 200, 242, 0.85);
+}
+
+/* ---------- title block -------------------------------------------------- */
+.fw-title-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 100%;
+  will-change: opacity, transform;
+}
+.fw-title-kicker {
+  font-family: var(--font-mono);
+  font-size: clamp(8px, 1.05vw, 10.5px);
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: rgba(57, 200, 242, 0.9);
+  margin-bottom: clamp(10px, 1.8vh, 20px);
+  text-align: center;
+  white-space: nowrap;
+}
+.fw-hero {
+  font-family: var(--font-sans);
+  font-size: clamp(27px, 7.1vw, 100px);
+  font-weight: 600;
+  line-height: 0.94;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #f1f5fc;
+  white-space: nowrap;
+  max-width: 100%;
+  text-shadow: 0 0 46px rgba(8, 13, 24, 0.95), 0 0 18px rgba(8, 13, 24, 0.9);
+  will-change: opacity, transform, letter-spacing;
+}
+.fw-hero .fw-hero-accent {
+  color: #39c8f2;
+  text-shadow: 0 0 26px rgba(57, 200, 242, 0.6), 0 0 60px rgba(57, 200, 242, 0.28);
+}
+.fw-accent-line {
+  height: 1px;
+  width: clamp(110px, 24vw, 340px);
+  margin: clamp(13px, 2.2vh, 24px) 0 0;
+  background: linear-gradient(
+    90deg,
+    rgba(57, 200, 242, 0) 0%,
+    rgba(57, 200, 242, 0.9) 32%,
+    rgba(255, 157, 66, 0.75) 68%,
+    rgba(255, 157, 66, 0) 100%
+  );
+  transform: scaleX(0);
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+.fw-tagline {
+  margin: clamp(12px, 1.9vh, 20px) 0 0;
+  max-width: 46ch;
+  text-align: center;
+  font-size: clamp(11.5px, 1.4vw, 16.5px);
+  line-height: 1.55;
+  letter-spacing: 0.005em;
+  color: rgba(241, 245, 252, 0.82);
+  text-shadow: 0 0 24px rgba(8, 13, 24, 0.95);
+  will-change: opacity, transform;
+}
+
+/* legibility band behind the title block — keeps the planet readable above/below */
+.fw-scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    ellipse 46% 25% at 50% 57%,
+    rgba(8, 13, 24, 0.92) 0%,
+    rgba(8, 13, 24, 0.74) 46%,
+    rgba(8, 13, 24, 0.28) 68%,
+    rgba(8, 13, 24, 0) 82%
+  );
+}
+
+.fw-sweep {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 46%;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(57, 200, 242, 0) 0%,
+    rgba(57, 200, 242, 0.05) 42%,
+    rgba(57, 200, 242, 0.13) 50%,
+    rgba(57, 200, 242, 0.05) 58%,
+    rgba(57, 200, 242, 0) 100%
+  );
+  filter: blur(16px);
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+}
+
+/* ---------- HUD / controls ---------------------------------------------- */
+.fw-hud {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 6;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+  padding: clamp(14px, 2.1vw, 30px);
+  padding-bottom: max(clamp(14px, 2.1vw, 30px), env(safe-area-inset-bottom));
+  pointer-events: none;
+  will-change: opacity;
+}
+.fw-hud-left {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.fw-microcopy {
+  font-family: var(--font-mono);
+  font-size: clamp(8px, 0.92vw, 10px);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(145, 162, 185, 0.8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fw-microcopy-dim {
+  color: rgba(145, 162, 185, 0.45);
+  letter-spacing: 0.26em;
+}
+.fw-hud-center {
+  flex: 0 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 2px;
+  min-width: 0;
+}
+.fw-phase {
+  font-family: var(--font-mono);
+  font-size: clamp(8px, 0.92vw, 10px);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(57, 200, 242, 0.85);
+  white-space: nowrap;
+}
+.fw-phase::before {
+  content: "";
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: #39c8f2;
+  box-shadow: 0 0 10px rgba(57, 200, 242, 0.9);
+  vertical-align: 1px;
+  animation: fw-blip 2.4s ease-in-out infinite;
+}
+@keyframes fw-blip {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+
+.fw-controls {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.fw-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 0 13px;
+  border-radius: 9px;
+  border: 1px solid rgba(34, 48, 74, 0.9);
+  background: rgba(16, 24, 39, 0.62);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: rgba(241, 245, 252, 0.92);
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.fw-btn:hover {
+  border-color: rgba(57, 200, 242, 0.45);
+  background: rgba(25, 38, 58, 0.8);
+  color: #f1f5fc;
+}
+.fw-btn:focus-visible {
+  outline: none;
+  border-color: rgba(57, 200, 242, 0.7);
+  box-shadow: 0 0 0 2px rgba(57, 200, 242, 0.45), 0 0 22px -6px rgba(57, 200, 242, 0.6);
+}
+.fw-btn-primary {
+  border-color: rgba(57, 200, 242, 0.32);
+  background: rgba(57, 200, 242, 0.1);
+  color: #bfeaff;
+}
+.fw-btn-primary:hover {
+  border-color: rgba(57, 200, 242, 0.7);
+  background: rgba(57, 200, 242, 0.18);
+  color: #ffffff;
+}
+.fw-btn .fw-btn-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.fw-btn .fw-btn-arrow {
+  transition: transform 160ms ease;
+}
+.fw-btn:hover .fw-btn-arrow {
+  transform: translateX(2px);
+}
+
+/* ---------- progress ---------------------------------------------------- */
+.fw-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 7;
+  height: 2px;
+  background: rgba(34, 48, 74, 0.55);
+  pointer-events: none;
+}
+.fw-progress-bar {
+  height: 100%;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: linear-gradient(90deg, rgba(57, 200, 242, 0.55) 0%, #39c8f2 62%, #ff9d42 100%);
+  box-shadow: 0 0 14px rgba(57, 200, 242, 0.55);
+  will-change: transform;
+}
+.fw-progress-bar-static {
+  animation: fw-progress-fill 2.2s linear forwards;
+}
+@keyframes fw-progress-fill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* ---------- veil (cut to and from the app) ------------------------------ */
+.fw-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  pointer-events: none;
+  background: #080d18;
+  opacity: 1;
+  will-change: opacity;
+}
+
+/* ---------- CSS-only fallback cosmos ------------------------------------ */
+.fw-css-cosmos {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  overflow: hidden;
+}
+.fw-css-bloom {
+  position: absolute;
+  width: min(140vmax, 1500px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  opacity: 0;
+  background: radial-gradient(
+    circle,
+    rgba(163, 226, 255, 0.5) 0%,
+    rgba(57, 200, 242, 0.2) 24%,
+    rgba(57, 200, 242, 0.07) 44%,
+    rgba(57, 200, 242, 0) 68%
+  );
+  filter: blur(38px);
+  will-change: opacity, transform;
+}
+.fw-css-planet {
+  position: relative;
+  width: min(64vmin, 560px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  opacity: 0;
+  will-change: opacity, transform;
+}
+.fw-css-planet-core {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 31% 26%, rgba(120, 200, 240, 0.34) 0%, rgba(20, 38, 60, 0) 46%),
+    radial-gradient(circle at 72% 76%, rgba(255, 99, 61, 0.26) 0%, rgba(255, 99, 61, 0) 50%),
+    radial-gradient(circle at 42% 38%, #2d5878 0%, #1e4160 36%, #142c44 68%, #0a1826 100%);
+  box-shadow:
+    inset -22px -26px 70px rgba(2, 5, 10, 0.92),
+    inset 10px 12px 44px rgba(57, 200, 242, 0.16),
+    0 0 90px rgba(57, 200, 242, 0.18);
+}
+.fw-css-planet-core::before {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  background:
+    radial-gradient(ellipse 30% 17% at 36% 33%, rgba(150, 194, 172, 0.55) 0%, rgba(150, 194, 172, 0) 72%),
+    radial-gradient(ellipse 21% 29% at 63% 55%, rgba(138, 176, 190, 0.45) 0%, rgba(138, 176, 190, 0) 72%),
+    radial-gradient(ellipse 38% 13% at 47% 71%, rgba(255, 157, 66, 0.24) 0%, rgba(255, 157, 66, 0) 72%),
+    radial-gradient(ellipse 16% 22% at 24% 62%, rgba(138, 176, 190, 0.34) 0%, rgba(138, 176, 190, 0) 70%),
+    radial-gradient(ellipse 52% 34% at 62% 26%, rgba(234, 243, 251, 0.22) 0%, rgba(234, 243, 251, 0) 74%);
+  filter: blur(7px);
+  animation: fw-css-drift 24s linear infinite;
+}
+@keyframes fw-css-drift {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  100% { transform: translate3d(-3%, 0, 0) rotate(-4deg); }
+}
+.fw-css-rim {
+  position: absolute;
+  inset: -3.5%;
+  border-radius: 50%;
+  box-shadow:
+    0 0 46px 8px rgba(57, 200, 242, 0.3),
+    inset 0 0 28px 2px rgba(57, 200, 242, 0.3);
+}
+.fw-css-ring {
+  position: absolute;
+  left: -14%;
+  right: -14%;
+  top: 45%;
+  height: 24%;
+  border: 1px solid rgba(57, 200, 242, 0.16);
+  border-radius: 50%;
+  transform: rotate(-17deg);
+}
+.fw-css-ring-b {
+  left: -22%;
+  right: -22%;
+  top: 41%;
+  height: 30%;
+  border-color: rgba(57, 200, 242, 0.1);
+  transform: rotate(-13deg);
+}
+
+/* ---------- reduced motion (2.2 s branding card) ------------------------ */
+.fw-reduced {
+  display: grid;
+  place-items: center;
+  padding: max(20px, 5vw);
+  background:
+    radial-gradient(90% 70% at 50% 44%, #0c1626 0%, #080d18 58%, #05080f 100%);
+}
+.fw-reduced-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(12px, 2.2vh, 20px);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 420ms ease-out, transform 520ms ease-out;
+  max-width: 100%;
+}
+.fw-reduced-inner[data-visible="true"] {
+  opacity: 1;
+  transform: none;
+}
+.fw-reduced-title {
+  font-family: var(--font-sans);
+  font-size: clamp(26px, 6.4vw, 76px);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.015em;
+  text-transform: uppercase;
+  color: #f1f5fc;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.fw-reduced-title .fw-hero-accent {
+  color: #39c8f2;
+}
+.fw-reduced-tagline {
+  max-width: 34ch;
+  text-align: center;
+  font-size: clamp(11.5px, 1.4vw, 16px);
+  line-height: 1.55;
+  color: rgba(241, 245, 252, 0.8);
+}
+
+/* ---------- responsive tuning ------------------------------------------- */
+@media (min-width: 900px) {
+  .fw-tagline {
+    max-width: 60ch;
+  }
+}
+
+@media (max-width: 720px) {
+  .fw-hud {
+    flex-wrap: wrap;
+    align-items: flex-end;
+    row-gap: 12px;
+  }
+  .fw-hud-center {
+    display: none;
+  }
+  .fw-controls {
+    width: 100%;
+    justify-content: stretch;
+  }
+  .fw-controls .fw-btn {
+    flex: 1 1 0;
+  }
+  .fw-sublabel {
+    letter-spacing: 0.24em;
+    white-space: normal;
+  }
+  .fw-tagline {
+    max-width: 26ch;
+  }
+}
+
+@media (max-width: 400px) {
+  .fw-btn {
+    padding: 0 11px;
+    font-size: 12px;
+  }
+  .fw-btn .fw-btn-label {
+    letter-spacing: 0.12em;
+  }
+}
+
+@media (min-width: 1600px) {
+  .fw-hero {
+    font-size: clamp(72px, 6.2vw, 118px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fw-grain,
+  .fw-phase::before,
+  .fw-css-planet-core::before {
+    animation: none;
+  }
+}

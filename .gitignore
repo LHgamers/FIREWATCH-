@@ -1,0 +1,73 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# next.js
+.next/
+out/
+build/
+dist/
+
+# production
+*.tsbuildinfo
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# env
+.env
+.env.*
+!.env.example
+
+# python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+engine/**/*.egg-info/
+*.egg-info/
+
+# data/runtime (re-ingest locally)
+data/*.db
+data/*.db-wal
+data/*.db-shm
+data/*.sqlite
+data/*.sqlite3
+
+# local ai bundles / artifacts
+local_ai/**/.venv/
+local_ai/**/dist/
+local_ai/**/build/
+local_ai/**/*.zip
+local_ai/**/*.tar
+local_ai/**/*.tar.gz
+local_ai/**/*.gguf
+local_ai/**/*.bin
+local_ai/**/SHA256SUMS.txt
+local_ai/firewatch-local-ai/
+
+# IDE/OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# caches
+.cache/
+
+# Private development and temporary files
+Prompt for deepseek ai.txt
+c_result.txt
+.intro-check/
+show.json

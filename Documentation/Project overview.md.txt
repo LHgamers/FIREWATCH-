@@ -1,0 +1,180 @@
+# FIREWATCH AI
+## Understanding Global Fire Activity Through Satellite Data
+**LH STUDIOS | NASA Space Apps Challenge 2026**
+
+---
+
+## 1. About the Project
+
+FIREWATCH AI is a satellite-based fire activity analysis platform designed to help people explore, understand and compare historical burning activity across different regions of the world.
+
+The platform addresses an important Earth observation challenge: MODIS and VIIRS satellite instruments detect thermal anomalies differently. Their spatial resolutions and detection characteristics differ, making their raw hotspot counts difficult to compare directly.
+
+FIREWATCH AI brings these observations into a unified analytical environment, with a focus on scientifically documented MODIS–VIIRS harmonization.
+
+Rather than simply displaying hotspots on a map, the platform aims to transform satellite observations into meaningful geographic, historical and statistical insights.
+
+## 2. The Problem We Address
+
+Wildfires and other sources of thermal activity affect ecosystems, communities, air quality, biodiversity and the environment.
+
+Satellite instruments provide valuable observations of this activity. However, researchers and users face several challenges:
+
+- Different satellite sensors produce observations with different characteristics.
+- Raw MODIS and VIIRS hotspot counts are not directly equivalent.
+- Historical fire activity can be difficult to investigate across long periods.
+- Identifying unusual seasonal patterns requires historical comparisons.
+- Large satellite datasets can be difficult to interpret without suitable visual tools.
+- Users may struggle to understand what the data actually means.
+
+These challenges make consistent, accessible historical analysis important.
+
+## 3. Our Solution
+
+FIREWATCH AI provides an integrated platform for geographic exploration, historical analysis and satellite-data comparison.
+
+Users can select a geographic area, choose a date range and investigate available satellite observations through interactive maps, charts and analytical tools.
+
+The platform focuses on:
+
+1. Geographic selection and area-based analysis.
+2. Historical MODIS and VIIRS observation exploration.
+3. Spatial and temporal aggregation.
+4. Sensor harmonization and comparison.
+5. Monthly and yearly burning activity patterns.
+6. Historical anomaly analysis.
+7. Data exports and reproducible research.
+8. AI-assisted explanations grounded in computed results.
+
+## 4. Key Features
+
+### Interactive Area of Interest Selection
+
+Users can investigate a specific region using geographic selection tools, coordinates, radius-based selection or geographic presets.
+
+This makes it possible to focus on a country, region or smaller study area rather than examining global data without context.
+
+### Historical Fire Activity Analysis
+
+The platform is designed to support historical exploration from 2000 to the present, subject to actual product availability and sensor coverage.
+
+Users can investigate activity across different years, months and geographic regions.
+
+### MODIS–VIIRS Harmonization
+
+This is the central scientific component of FIREWATCH AI.
+
+The system addresses differences between MODIS and VIIRS observations through documented spatial aggregation, temporal aggregation and calibration methods.
+
+The objective is to create a more consistent analytical time series while preserving original sensor observations and communicating uncertainty.
+
+### Burning Activity Calendar
+
+A year-by-month calendar helps users identify seasonal patterns and periods of unusually high or low recorded activity.
+
+Selecting a calendar cell can connect the historical result to its corresponding map view.
+
+### Historical Baseline and Anomaly Analysis
+
+Users can compare a selected period against historical values for comparable months.
+
+This helps reveal unusual changes in recorded burning activity and provides context that a simple hotspot count cannot offer.
+
+### Interactive Fire Map
+
+The map provides geographic context for satellite observations and supports exploration of different sensors, historical periods and analytical layers.
+
+### FIREWATCH AI
+
+The integrated AI assistant helps users understand analytical results through natural-language questions.
+
+It is designed to use actual application data and computed statistics rather than inventing measurements.
+
+### Research Exports
+
+The platform supports research-oriented outputs, including data and visualization exports, where implemented and verified.
+
+These outputs can help users preserve results and conduct further analysis.
+
+## 5. Why Is FIREWATCH AI Helpful?
+
+FIREWATCH AI is useful because it connects satellite observations with the geographic and historical context needed to interpret them.
+
+**For researchers:** It provides a structured environment for comparing satellite observations, exploring historical trends and examining harmonization methods.
+
+**For environmental organizations:** It can help identify regions and periods that deserve further investigation.
+
+**For students and educators:** It makes Earth observation concepts and satellite datasets easier to explore through interactive visualizations.
+
+**For analysts:** It offers a way to investigate historical activity, compare regions and export analytical results.
+
+**For the general public:** It can make complex satellite information more understandable and accessible.
+
+The platform is intended to support research, exploration and informed environmental understanding. It does not replace official emergency services or operational wildfire monitoring systems.
+
+## 6. Why MODIS–VIIRS Harmonization Matters
+
+Combining observations from different satellite instruments is not as simple as adding their hotspot counts together.
+
+MODIS and VIIRS differ in spatial resolution and detection characteristics. Direct comparisons can therefore create misleading conclusions about changes in burning activity.
+
+FIREWATCH AI addresses this challenge by applying a documented analytical approach:
+
+1. Collect original satellite observations.
+2. Validate and preserve source information.
+3. Apply appropriate confidence and source filters.
+4. Aggregate observations onto a consistent analytical grid.
+5. Calculate comparable temporal activity measures.
+6. Estimate calibration relationships using overlapping observations.
+7. Produce a harmonized analytical time series.
+8. Evaluate agreement, uncertainty and limitations.
+
+The scientific objective is comparability, not pretending that different sensors are identical.
+
+## 7. NASA Earth Observation Data
+
+FIREWATCH AI is designed around authoritative Earth observation sources, including:
+
+- NASA FIRMS.
+- MODIS Terra.
+- MODIS Aqua.
+- VIIRS Suomi-NPP.
+- VIIRS NOAA-20.
+- VIIRS NOAA-21.
+- NASA GIBS where appropriate.
+
+Original observations and their provenance should remain distinguishable from derived and harmonized measurements.
+
+Historical coverage depends on the actual availability of each satellite product.
+
+## 8. Scientific Responsibility and Limitations
+
+FIREWATCH AI recognizes that satellite hotspot observations have limitations.
+
+Thermal anomalies do not necessarily represent confirmed wildfires. Satellite coverage, clouds, observation timing, detection thresholds and sensor characteristics can affect recorded activity.
+
+Harmonization introduces methodological choices and uncertainty. Statistical anomalies do not automatically indicate danger or predict future events.
+
+For these reasons, the platform distinguishes original observations, derived measurements, harmonized estimates and statistical interpretations.
+
+Scientific transparency is a core part of the project.
+
+## 9. Our Intended Impact
+
+FIREWATCH AI aims to make historical satellite fire information easier to investigate and interpret.
+
+By connecting geographic selection, satellite-data harmonization, historical analysis and AI-assisted explanations, the project seeks to reduce the gap between complex Earth observation datasets and understandable environmental insights.
+
+Its broader goal is to support accessible, reproducible and scientifically responsible exploration of global burning activity.
+
+## 10. Project Information
+
+Project: FIREWATCH AI  
+Organization: LH STUDIOS  
+Challenge: NASA Space Apps Challenge 2026  
+Topic:*Harmonization of MODIS and VIIRS Hot Spots  
+Repository https://github.com/LHgamers/FIREWATCH-.git  
+
+FIREWATCH AI — Turning Satellite Observations Into Understandable Environmental Insights.
+
+Built by LH STUDIOS.

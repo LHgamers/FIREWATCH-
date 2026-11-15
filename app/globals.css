@@ -1,0 +1,393 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   DESIGN TOKENS
+   Palette values are space-separated RGB triples. Tailwind maps them through
+   `rgb(var(--token) / <alpha-value>)` (see tailwind.config.ts), so every
+   `bg-panel/70`, `border-line/80`, `text-cyan/70` … keeps working in both themes.
+   Do not write `#hex` outside this block.
+   ========================================================================== */
+
+:root {
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  /* FIREWATCH night palette (default identity) */
+  --void: 8 13 24; /* #080D18 */
+  --base: 11 18 32; /* #0B1220 */
+  --surface: 16 24 39; /* #101827 */
+  --panel: 19 30 48; /* #131E30 */
+  --elevated: 25 38 58; /* #19263A */
+  --line: 34 48 74; /* #22304A */
+  --cyan: 57 200 242; /* #39C8F2 */
+  --cyan-dim: 30 124 155; /* #1E7C9B */
+  --ember: 255 157 66; /* #FF9D42 */
+  --fire: 255 99 61; /* #FF633D */
+  --ok: 64 214 160; /* #40D6A0 */
+  --ink: 241 245 252; /* #F1F5FC */
+  --muted: 145 162 185; /* #91A2B9 */
+  --violet: 185 164 255; /* #B9A4FF dual-sensor */
+
+  /* Derived chrome (not part of the Tailwind palette, but themed with it) */
+  --shadow-panel: 0 1px 0 0 rgb(255 255 255 / 0.03) inset, 0 24px 60px -30px rgb(0 0 0 / 0.9);
+  --shadow-glow: 0 0 0 1px rgb(var(--cyan) / 0.25), 0 0 40px -12px rgb(var(--cyan) / 0.45);
+  --grid-stroke: rgb(var(--cyan) / 0.06);
+  --scrollbar-thumb: 28 41 66; /* #1C2942 */
+  --scrollbar-thumb-hover: 42 58 88; /* #2A3A58 */
+
+  color-scheme: dark;
+}
+
+/* Daylight geospatial-analytics palette: paper background, white panels,
+   slate hairlines, dark ink, accents darkened for AA on white. */
+:root[data-theme="light"] {
+  --void: 245 247 250; /* #F5F7FA paper */
+  --base: 255 255 255; /* #FFFFFF */
+  --surface: 248 250 252; /* #F8FAFC */
+  --panel: 255 255 255; /* #FFFFFF */
+  --elevated: 241 245 249; /* #F1F5F9 */
+  --line: 203 213 225; /* #CBD5E1 slate */
+  --cyan: 14 116 144; /* #0E7490 */
+  --cyan-dim: 21 94 117; /* #155E75 */
+  --ember: 180 83 9; /* #B45309 */
+  --fire: 194 65 12; /* #C2410C */
+  --ok: 4 120 87; /* #047857 */
+  --ink: 14 23 38; /* #0E1726 */
+  --muted: 90 107 130; /* #5A6B82 */
+  --violet: 109 74 224; /* #6D4AE0 dual-sensor (4.6:1 on white) */
+
+  --shadow-panel: 0 1px 2px 0 rgb(15 23 42 / 0.05), 0 20px 44px -32px rgb(15 23 42 / 0.32);
+  --shadow-glow: 0 0 0 1px rgb(var(--cyan) / 0.3), 0 10px 30px -18px rgb(var(--cyan) / 0.35);
+  --grid-stroke: rgb(var(--cyan) / 0.12);
+  --scrollbar-thumb: 203 213 225; /* #CBD5E1 */
+  --scrollbar-thumb-hover: 148 163 184; /* #94A3B8 */
+
+  color-scheme: light;
+}
+
+* {
+  border-color: rgb(var(--line));
+}
+
+body {
+  background-color: rgb(var(--void));
+  color: rgb(var(--ink));
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  background-image:
+    radial-gradient(900px 600px at 12% -10%, rgb(var(--cyan) / 0.08), transparent 60%),
+    radial-gradient(700px 500px at 100% 0%, rgb(var(--ember) / 0.05), transparent 55%),
+    radial-gradient(1200px 800px at 50% 120%, rgb(var(--panel) / 0.9), transparent 60%);
+  background-attachment: fixed;
+}
+
+html[data-intro="playing"] .fw-app-shell {
+  opacity: 0;
+  visibility: hidden;
+}
+
+@keyframes fw-app-shell-reveal {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+html[data-intro="complete"] .fw-app-shell {
+  visibility: visible;
+  animation: fw-app-shell-reveal 560ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-intro="complete"] .fw-app-shell {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+html[data-motion="off"][data-intro="complete"] .fw-app-shell {
+  animation: none;
+  opacity: 1;
+}
+
+:root[data-theme="light"] body {
+  /* Paper light instead of a teal wash: one cool highlight, one warm, then white paper. */
+  background-image:
+    radial-gradient(900px 600px at 12% -10%, rgb(var(--cyan) / 0.1), transparent 62%),
+    radial-gradient(700px 520px at 100% 0%, rgb(var(--ember) / 0.07), transparent 58%),
+    radial-gradient(1200px 800px at 50% 118%, rgb(255 255 255 / 0.9), transparent 62%);
+}
+
+::selection {
+  background: rgb(var(--cyan) / 0.28);
+  color: rgb(255 255 255);
+}
+
+:root[data-theme="light"] ::selection {
+  background: rgb(var(--cyan) / 0.18);
+  color: rgb(var(--ink));
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--scrollbar-thumb));
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--scrollbar-thumb-hover));
+  background-clip: padding-box;
+}
+
+@layer components {
+  .panel {
+    @apply relative rounded-xl border border-line/80 bg-panel/70 shadow-panel backdrop-blur-sm;
+  }
+  .panel-flat {
+    @apply relative rounded-xl border border-line/70 bg-surface/60;
+  }
+  .panel-head {
+    @apply flex items-center justify-between gap-3 border-b border-line/70 px-4 py-3;
+  }
+  .panel-title {
+    @apply text-[13px] font-semibold tracking-[0.01em] text-ink;
+  }
+  .kicker {
+    @apply font-mono text-[10px] uppercase tracking-[0.18em] text-muted;
+  }
+  .value {
+    @apply font-mono tabular-nums tracking-tight text-ink;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-md border border-line bg-elevated/60 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-line bg-elevated/70 px-3 py-2 text-[12.5px] font-medium text-ink transition-colors hover:border-cyan/40 hover:bg-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-void disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply border-cyan/40 bg-cyan/15 text-cyan hover:border-cyan/70 hover:bg-cyan/20;
+  }
+  .btn-ghost {
+    @apply border-transparent bg-transparent text-muted hover:border-line hover:bg-elevated/60 hover:text-ink;
+  }
+  .link-quiet {
+    @apply text-[12px] text-cyan/90 transition-colors hover:text-cyan;
+  }
+  .hairline {
+    @apply h-px w-full bg-gradient-to-r from-transparent via-line to-transparent;
+  }
+  .grid-bg {
+    background-image:
+      linear-gradient(var(--grid-stroke) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-stroke) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+  .scroll-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--scrollbar-thumb)) transparent;
+  }
+}
+
+/* Text-alpha floor: translucent secondary text must not fall under AA.
+   `text-muted/60` measured 3.36:1 on the dark panel and 2.3:1 on white, and
+   `text-cyan/70` ~2.9:1 on white, so sub-80% *text* alpha is clamped to 95% of
+   the solid token. Dark identity is preserved (only secondary labels brighten
+   slightly, 3.36 → 6.8); backgrounds/borders keep their real transparency. */
+.text-muted\/50,
+.text-muted\/55,
+.text-muted\/60,
+.text-muted\/70,
+.text-muted\/80 {
+  color: rgb(var(--muted) / 0.95);
+}
+:root[data-theme="light"] .text-cyan\/70,
+:root[data-theme="light"] .text-cyan\/80,
+:root[data-theme="light"] .text-cyan\/90 {
+  color: rgb(var(--cyan) / 0.95);
+}
+:root[data-theme="light"] .text-ember\/80,
+:root[data-theme="light"] .text-ember\/90 {
+  color: rgb(var(--ember) / 0.95);
+}
+:root[data-theme="light"] .text-ok\/90 {
+  color: rgb(var(--ok) / 0.95);
+}
+:root[data-theme="light"] .link-quiet {
+  color: rgb(var(--cyan) / 0.95);
+}
+/* Primary buttons sit on a cyan tint in light mode; --cyan on that tint is 4.26:1,
+   so the label steps down to --cyan-dim (deeper teal) to clear AA. */
+:root[data-theme="light"] .btn-primary {
+  color: rgb(var(--cyan-dim));
+}
+
+@keyframes sweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+.loading-sweep::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgb(var(--cyan) / 0.18), transparent);
+  animation: sweep 1.8s infinite;
+}
+
+/* MapLibre chrome stays night-toned in both themes: the basemap itself is the
+   dark NASA GIBS raster (lib/map-style.ts), so light controls would float. */
+.maplibregl-map {
+  font-family: var(--font-sans);
+  background: #05080f;
+}
+.maplibregl-ctrl-group {
+  background: rgba(19, 30, 48, 0.92) !important;
+  border: 1px solid rgba(34, 48, 74, 0.9) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 10px 30px -18px rgba(0, 0, 0, 0.9) !important;
+  overflow: hidden;
+}
+.maplibregl-ctrl-group button {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(34, 48, 74, 0.7) !important;
+}
+.maplibregl-ctrl-group button:last-child {
+  border-bottom: none !important;
+}
+.maplibregl-ctrl-icon {
+  filter: invert(1) hue-rotate(180deg) brightness(1.4);
+  opacity: 0.75;
+}
+.maplibregl-ctrl-attrib {
+  background: rgba(8, 13, 24, 0.78) !important;
+  color: #91a2b9 !important;
+  font-size: 10px !important;
+  border-radius: 6px 0 0 0;
+}
+.maplibregl-ctrl-attrib a {
+  color: #91a2b9 !important;
+}
+.maplibregl-popup-content {
+  background: rgba(19, 30, 48, 0.97) !important;
+  border: 1px solid rgba(34, 48, 74, 1);
+  border-radius: 10px !important;
+  color: #f1f5fc !important;
+  padding: 0 !important;
+  box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.9) !important;
+}
+.maplibregl-popup-tip {
+  border-top-color: rgba(19, 30, 48, 0.97) !important;
+}
+.maplibregl-ctrl-scale {
+  background: rgba(8, 13, 24, 0.6) !important;
+  border-color: #2a3a58 !important;
+  color: #91a2b9 !important;
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ------------------------------------------------ print (PDF report)
+   Always dark-on-white paper, independent of the active theme. */
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm;
+  }
+  html {
+    color-scheme: light;
+  }
+  html,
+  body {
+    background: #ffffff !important;
+    color: #0b1220 !important;
+    background-image: none !important;
+  }
+  aside,
+  header.sticky,
+  footer,
+  .no-print {
+    display: none !important;
+  }
+  .lg\:pl-\[232px\] {
+    padding-left: 0 !important;
+  }
+  main {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+  .panel,
+  .panel-flat {
+    background: #ffffff !important;
+    border-color: #c8d2e0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    break-inside: avoid;
+  }
+  .panel-head {
+    border-color: #dbe3ee !important;
+  }
+  .text-muted,
+  .text-muted\/70,
+  .text-muted\/80,
+  .text-muted\/90,
+  .kicker,
+  .link-quiet {
+    color: #46566e !important;
+  }
+  .text-ink,
+  .value,
+  .panel-title {
+    color: #0b1220 !important;
+  }
+  .text-cyan,
+  .text-cyan\/70,
+  .text-cyan\/80,
+  .text-cyan\/90 {
+    color: #0b5b70 !important;
+  }
+  .text-ember,
+  .text-ember\/80,
+  .text-ember\/90 {
+    color: #8a3f06 !important;
+  }
+  .text-ok {
+    color: #046b4e !important;
+  }
+  .btn,
+  .chip,
+  .badge {
+    border-color: #c8d2e0 !important;
+    background: #f4f7fb !important;
+    color: #24334d !important;
+  }
+  .grid-bg,
+  .absolute.inset-0.grid-bg {
+    display: none !important;
+  }
+  a[href]::after {
+    content: "";
+  }
+}
